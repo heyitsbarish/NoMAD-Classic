@@ -200,12 +200,6 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
         // Allows us to force windows to show when menu clicked.
         self.NoMADMenu.delegate = self
 
-        // Handle status item clicks explicitly and pop the menu ourselves.
-        // Relying on statusItem.menu's automatic click handling does not
-        // reliably open the menu on current macOS, so we drive it here.
-        statusItem.button?.target = self
-        statusItem.button?.action = #selector(statusItemClicked)
-
         // see if we should auto-configure
         setDefaults()
 
@@ -837,14 +831,6 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
         }
     }
 
-    // Called when the user clicks the menu bar icon; pops the NoMAD menu.
-    @objc func statusItemClicked() {
-        guard let button = statusItem.button else { return }
-        NoMADMenu.popUp(positioning: nil,
-                        at: NSPoint(x: 0, y: button.bounds.height + 5),
-                        in: button)
-    }
-
     func testSite(caURL: String, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) {
 
         let request = NSMutableURLRequest(url: URL(string: caURL)!)
@@ -1172,8 +1158,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
                     // build the menu
 
-                    // Menu is popped manually via statusItemClicked(); see awakeFromNib.
-                    // Assigning statusItem.menu here would suppress our click handler.
+                    self.statusItem.menu = self.NoMADMenu
 
                     // set the menu icon
                     if self.userInformation.status == "Connected" {

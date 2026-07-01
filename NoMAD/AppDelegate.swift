@@ -63,7 +63,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             SCDynamicStoreSetNotificationKeys(dynamicStore, nil, keysArray)
             let loop = SCDynamicStoreCreateRunLoopSource(kCFAllocatorDefault, dynamicStore, 0)
             CFRunLoopAddSource(CFRunLoopGetCurrent(), loop, .defaultMode)
-            CFRunLoopRun()
+            // Note: no CFRunLoopRun() here. The source above is serviced by the
+            // main run loop that NSApplication already runs. Calling CFRunLoopRun()
+            // blocked applicationDidFinishLaunching forever, which on modern macOS
+            // wedges NSApp's event loop: status item clicks are never dispatched
+            // and scheduleTimer() below is never reached.
         }
 
         scheduleTimer()
