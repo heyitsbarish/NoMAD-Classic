@@ -824,10 +824,10 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
     }
 
     @objc func animateMenuItem() {
-        if statusItem.image == iconOnOn {
-            statusItem.image = iconOffOff
+        if statusItem.button?.image == iconOnOn {
+            statusItem.button?.image = iconOffOff
         } else {
-            statusItem.image = iconOnOn
+            statusItem.button?.image = iconOnOn
         }
     }
 
@@ -946,11 +946,11 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
             }
         }
         if self.userInformation.status == "Connected" {
-            self.statusItem.image = self.iconOnOff
+            self.statusItem.button?.image = self.iconOnOff
         } else if self.userInformation.status == "Logged In" && self.userInformation.myLDAPServers.tickets.state {
-            self.statusItem.image = self.iconOnOn
+            self.statusItem.button?.image = self.iconOnOn
         } else {
-            self.statusItem.image = self.iconOffOff
+            self.statusItem.button?.image = self.iconOffOff
         }
     }
 
@@ -1024,11 +1024,11 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
         // now set it rights
         if self.userInformation.status == "Connected" {
-            self.statusItem.image = self.iconOnOff
+            self.statusItem.button?.image = self.iconOnOff
         } else if self.userInformation.status == "Logged In" && self.userInformation.myLDAPServers.tickets.state {
-            self.statusItem.image = self.iconOnOn
+            self.statusItem.button?.image = self.iconOnOn
         } else {
-            self.statusItem.image = self.iconOffOff
+            self.statusItem.button?.image = self.iconOffOff
         }
     }
 
@@ -1162,18 +1162,18 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
                     // set the menu icon
                     if self.userInformation.status == "Connected" {
-                        self.statusItem.image = self.iconOnOff
+                        self.statusItem.button?.image = self.iconOnOff
                         // we do this twice b/c doing it only once seems to make it less than full width
-                        self.statusItem.title = self.userInformation.status.translate
-                        self.statusItem.title = self.userInformation.status.translate
+                        self.statusItem.button?.title = self.userInformation.status.translate
+                        self.statusItem.button?.title = self.userInformation.status.translate
 
                         // if we're not logged in we disable some options
 
-                        self.statusItem.toolTip = dateFormatter.string(from: self.userInformation.userPasswordExpireDate as Date)
+                        self.statusItem.button?.toolTip = dateFormatter.string(from: self.userInformation.userPasswordExpireDate as Date)
                         self.NoMADMenuTicketLife.title = "NoMADMenuController-NotLoggedIn".translate + " NoMAD Version: " + String(describing: Bundle.main.infoDictionary!["CFBundleShortVersionString"]!) + " " +  String(describing: Bundle.main.infoDictionary!["CFBundleVersion"]!)
 
                     } else if self.userInformation.status == "Logged In" && self.userInformation.myLDAPServers.tickets.state || defaults.bool(forKey: Preferences.persistExpiration) {
-                        self.statusItem.image = self.iconOnOn
+                        self.statusItem.button?.image = self.iconOnOn
 
                         // if we're logged in we enable some options
 
@@ -1182,7 +1182,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
                         if self.userInformation.passwordAging {
 
-                            self.statusItem.toolTip = dateFormatter.string(from: self.userInformation.userPasswordExpireDate as Date)
+                            self.statusItem.button?.toolTip = dateFormatter.string(from: self.userInformation.userPasswordExpireDate as Date)
 
                             self.NoMADMenuTicketLife.title = dateFormatter.string(from: self.userInformation.myLDAPServers.tickets.expire as Date) + " " + self.userInformation.myLDAPServers.currentServer + " NoMAD Version: " + String(describing: Bundle.main.infoDictionary!["CFBundleShortVersionString"]!) + " " +  String(describing: Bundle.main.infoDictionary!["CFBundleVersion"]!)
 
@@ -1196,15 +1196,15 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
                                     let myMutableString = NSMutableAttributedString(string: defaults.string(forKey: Preferences.passwordExpireCustomAlert)!)
                                     myMutableString.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.red, range: NSRange(location: 0, length: len!))
 
-                                    self.statusItem.attributedTitle = myMutableString
-                                    self.statusItem.attributedTitle = myMutableString
+                                    self.statusItem.button?.attributedTitle = myMutableString
+                                    self.statusItem.button?.attributedTitle = myMutableString
 
                                 } else if Int(daysToGo) < defaults.integer(forKey: Preferences.passwordExpireCustomWarnTime) {
                                     let myMutableString = NSMutableAttributedString(string: defaults.string(forKey: Preferences.passwordExpireCustomAlert)!)
                                     myMutableString.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.yellow, range: NSRange(location: 0, length: len!))
 
-                                    self.statusItem.attributedTitle = myMutableString
-                                    self.statusItem.attributedTitle = myMutableString
+                                    self.statusItem.button?.attributedTitle = myMutableString
+                                    self.statusItem.button?.attributedTitle = myMutableString
 
 
                                 }
@@ -1214,29 +1214,29 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
                             // we do this twice b/c doing it only once seems to make it less than full width
                             if Int(daysToGo) > 4 {
-                                self.statusItem.title = (String(daysToGo) + "d".translate )
-                                self.statusItem.title = (String(daysToGo) + "d".translate )
+                                self.statusItem.button?.title = (String(daysToGo) + "d".translate )
+                                self.statusItem.button?.title = (String(daysToGo) + "d".translate )
                                 self.NoMADMenuPasswordExpires.title = String(format: "NoMADMenuController-PasswordExpiresInDays".translate, String(daysToGo))
                             } else {
 
                                 let myMutableString = NSMutableAttributedString(string: String(daysToGo) + "d".translate)
                                 myMutableString.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.red, range: NSRange(location: 0, length: 2))
-                                self.statusItem.attributedTitle = myMutableString
-                                self.statusItem.attributedTitle = myMutableString
+                                self.statusItem.button?.attributedTitle = myMutableString
+                                self.statusItem.button?.attributedTitle = myMutableString
                                 self.NoMADMenuPasswordExpires.title = String(format: "NoMADMenuController-PasswordExpiresInDays".translate, String(daysToGo))
                             }
                             }
                         } else {
 
                             // we do this twice b/c doing it only once seems to make it less than full width
-                            self.statusItem.title = ""
-                            self.statusItem.title = ""
+                            self.statusItem.button?.title = ""
+                            self.statusItem.button?.title = ""
                             self.NoMADMenuTicketLife.title = dateFormatter.string(from: self.userInformation.myLDAPServers.tickets.expire as Date) + " " + self.userInformation.myLDAPServers.currentServer + " NoMAD Version: " + String(describing: Bundle.main.infoDictionary!["CFBundleShortVersionString"]!) + " " +  String(describing: Bundle.main.infoDictionary!["CFBundleVersion"]!)
-                            self.statusItem.toolTip = defaults.string(forKey: Preferences.hideExpirationMessage) ?? "PasswordDoesNotExpire".translate
+                            self.statusItem.button?.toolTip = defaults.string(forKey: Preferences.hideExpirationMessage) ?? "PasswordDoesNotExpire".translate
                             self.NoMADMenuPasswordExpires.title = defaults.string(forKey: Preferences.hideExpirationMessage) ?? "PasswordDoesNotExpire".translate
                         }
                     } else {
-                        self.statusItem.image = self.iconOffOff
+                        self.statusItem.button?.image = self.iconOffOff
                         
                         self.NoMADMenuTicketLife.title = "NoMAD Version: " + String(describing: Bundle.main.infoDictionary!["CFBundleShortVersionString"]!) + " " +  String(describing: Bundle.main.infoDictionary!["CFBundleVersion"]!)
 
@@ -1244,15 +1244,15 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
                         if self.userInformation.connected {
                             // we do this twice b/c doing it only once seems to make it less than full width
-                            self.statusItem.title = self.userInformation.status.translate
-                            self.statusItem.title = self.userInformation.status.translate
+                            self.statusItem.button?.title = self.userInformation.status.translate
+                            self.statusItem.button?.title = self.userInformation.status.translate
                         } else {
 
                             // use the custom message if it exists
 
                             // we do this twice b/c doing it only once seems to make it less than full width
-                            self.statusItem.title = defaults.string(forKey: Preferences.messageNotConnected) ?? self.userInformation.status.translate
-                            self.statusItem.title = defaults.string(forKey: Preferences.messageNotConnected) ?? self.userInformation.status.translate
+                            self.statusItem.button?.title = defaults.string(forKey: Preferences.messageNotConnected) ?? self.userInformation.status.translate
+                            self.statusItem.button?.title = defaults.string(forKey: Preferences.messageNotConnected) ?? self.userInformation.status.translate
                         }
                     }
 
