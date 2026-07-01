@@ -99,9 +99,9 @@ class ShareMounter {
         var requestID: AsyncRequestID? = nil
         let queue = DispatchQueue.main
 
-        NetFSMountURLAsync(shareAddress as CFURL!,
+        NetFSMountURLAsync(shareAddress as CFURL,
                            nil,
-                           defaults.string(forKey: Preferences.userPrincipal)! as CFString!,
+                           defaults.string(forKey: Preferences.userPrincipal)! as CFString,
                            nil,
                            nil,
                            mount_options,

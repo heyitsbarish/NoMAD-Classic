@@ -37,7 +37,7 @@ let preferencesWindow = PreferencesWindow()
 let passwordChangeWindow = PasswordChangeWindow()
 let loginWindow = LoginWindow()
 
-class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate, PreferencesWindowDelegate, NSMenuDelegate, NSUserNotificationCenterDelegate {
+class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate, PreferencesWindowDelegate, NSMenuDelegate, NSUserNotificationCenterDelegate, NSMenuItemValidation {
     @objc
     // menu item connections
     @IBOutlet weak var NoMADMenu: NSMenu!
@@ -104,7 +104,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
     var selfService: SelfServiceType?
 
-    let statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
+    let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     
     let PKINITMenuItem = NSMenuItem()
     
@@ -126,7 +126,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
         while myKeychainutil.checkLockedKeychain() && defaults.bool(forKey: Preferences.lockedKeychainCheck) {
             // pause until Keychain is fixed
             myLogger.logit(.base, message: "Waiting for keychain to unlock.")
-            RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date.distantFuture)
+            RunLoop.current.run(mode: RunLoop.Mode.default, before: Date.distantFuture)
         }
 
         // AppleEvents
@@ -283,7 +283,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
         // wait for any updates to finish
 
         //while updateRunning {
-        //RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date.distantFuture)
+        //RunLoop.current.run(mode: RunLoop.Mode.default, before: Date.distantFuture)
         //}
 
         // configure Chrome
@@ -342,7 +342,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
             myErr = myKerbUtil.getKerbCredentials(myPass, userPrinc)
 
             while ( !myKerbUtil.finished ) {
-                RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date.distantFuture)
+                RunLoop.current.run(mode: RunLoop.Mode.default, before: Date.distantFuture)
             }
 
             if myErr == nil {
@@ -367,9 +367,9 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
                 let name = defaults.string(forKey: Preferences.lastUser)! + "@" + defaults.string(forKey: Preferences.kerberosRealm)!
 
                 myErr = SecKeychainFindGenericPassword(nil,
-                                                       UInt32(serviceName.characters.count),
+                                                       UInt32(serviceName.count),
                                                        serviceName,
-                                                       UInt32(name.characters.count),
+                                                       UInt32(name.count),
                                                        name,
                                                        &passLength,
                                                        &passPtr, &myKeychainItem)
@@ -412,9 +412,9 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
             let name = defaults.string(forKey: Preferences.lastUser)! + "@" + defaults.string(forKey: Preferences.kerberosRealm)!
 
             myErr = SecKeychainFindGenericPassword(nil,
-                                                   UInt32(serviceName.characters.count),
+                                                   UInt32(serviceName.count),
                                                    serviceName,
-                                                   UInt32(name.characters.count),
+                                                   UInt32(name.count),
                                                    name,
                                                    &passLength,
                                                    &passPtr, &myKeychainItem)
@@ -450,7 +450,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
         //  cliTask("/System/Library/CoreServices/Menu\\ Extras/User.menu/Contents/Resources/CGSession -suspend")
         let registry: io_registry_entry_t = IORegistryEntryFromPath(kIOMasterPortDefault, "IOService:/IOResources/IODisplayWrangler")
-        let _ = IORegistryEntrySetCFProperty(registry, "IORequestIdle" as CFString!, true as CFTypeRef!)
+        let _ = IORegistryEntrySetCFProperty(registry, "IORequestIdle" as CFString, true as CFTypeRef)
         IOObjectRelease(registry)
 
     }
@@ -467,7 +467,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
         let libHandle = dlopen("/System/Library/PrivateFrameworks/login.framework/Versions/Current/login", RTLD_LAZY)
         let sym = dlsym(libHandle, "SACLockScreenImmediate")
-        typealias myFunction = @convention(c) (Void) -> Void
+        typealias myFunction = @convention(c) () -> Void
         let SACLockScreenImmediate = unsafeBitCast(sym, to: myFunction.self)
         SACLockScreenImmediate()
     }
@@ -487,11 +487,11 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
         switch selfService {
         case .casper:
-            NSWorkspace.shared().launchApplication("/Applications/Self Service.app")
+            NSWorkspace.shared.launchApplication("/Applications/Self Service.app")
         case .lanrev:
             cliTask("/Library/Application\\ Support/LANrev\\ Agent/LANrev\\ Agent.app/Contents/MacOS/LANrev\\ Agent --ShowOnDemandPackages")
         case .munki:
-            NSWorkspace.shared().launchApplication("/Applications/Managed Software Center.app")
+            NSWorkspace.shared.launchApplication("/Applications/Managed Software Center.app")
         case .custom:
             cliTask("/usr/bin/open " + defaults.string(forKey: Preferences.selfServicePath)!)
         }
@@ -518,12 +518,12 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
     // quit when asked
     @IBAction func NoMADMenuClickQuit(_ sender: NSMenuItem) {
-        NSApplication.shared().terminate(self)
+        NSApplication.shared.terminate(self)
     }
 
     // show PKINITer when asked
 
-    func smartcardSignIn() {
+    @objc func smartcardSignIn() {
         launchPKINITer()
     }
 
@@ -556,7 +556,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
                     alertController.addButton(withTitle: "Cancel".translate)
                     alertController.addButton(withTitle: "RequestAnyway".translate)
 
-                    myResponse = alertController.runModal()
+                    myResponse = alertController.runModal().rawValue
 
                     if myResponse == 1000 {
                         return
@@ -590,7 +590,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
                 )})
 
             while caTestWait {
-                RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date.distantFuture)
+                RunLoop.current.run(mode: RunLoop.Mode.default, before: Date.distantFuture)
                 myLogger.logit(.debug, message: "Waiting for CA test to complete.")
             }
 
@@ -663,7 +663,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
     }
 
     // this will update the menu when it's clicked
-    override func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         // Makes all NoMAD windows come to top
         // NSApp.activateIgnoringOtherApps(true)
 
@@ -804,7 +804,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
     }
 
     // everything to do on a network change
-    func doTheNeedfull() {
+    @objc func doTheNeedfull() {
 
         if ( self.userInformation.myLDAPServers.getDomain() == "not set" ) {
             //self.userInformation.myLDAPServers.tickets.getDetails()
@@ -815,7 +815,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
     }
 
     // simple function to renew tickets
-    func renewTickets(){
+    @objc func renewTickets(){
         cliTask("/usr/bin/kinit -R")
         userInformation.myLDAPServers.tickets.getDetails()
         if defaults.bool(forKey: Preferences.verbose) == true {
@@ -823,7 +823,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
         }
     }
 
-    func animateMenuItem() {
+    @objc func animateMenuItem() {
         if statusItem.image == iconOnOn {
             statusItem.image = iconOffOff
         } else {
@@ -866,7 +866,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
             myErr = myKerbUtil.getKerbCredentials(myPass, userPrinc)
 
             while ( !myKerbUtil.finished ) {
-                RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date.distantFuture)
+                RunLoop.current.run(mode: RunLoop.Mode.default, before: Date.distantFuture)
             }
 
             if myErr == nil {
@@ -901,9 +901,9 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
                 let name = defaults.string(forKey: Preferences.lastUser)! + "@" + defaults.string(forKey: Preferences.kerberosRealm)!
 
                 myErr = SecKeychainFindGenericPassword(nil,
-                                                       UInt32(serviceName.characters.count),
+                                                       UInt32(serviceName.count),
                                                        serviceName,
-                                                       UInt32(name.characters.count),
+                                                       UInt32(name.count),
                                                        name,
                                                        &passLength,
                                                        &passPtr, &myKeychainItem)
@@ -925,7 +925,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
     // change the menu item if it's dark
 
-    func interfaceModeChanged() {
+    @objc func interfaceModeChanged() {
         if UserDefaults.standard.persistentDomain(forName: UserDefaults.globalDomain)?["AppleInterfaceStyle"] == nil {
             if !defaults.bool(forKey: Preferences.caribouTime) {
                 iconOnOn = myIconOn
@@ -955,7 +955,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
     }
 
 
-    func handleAppleEvent(_ event: NSAppleEventDescriptor, withReplyEvent: NSAppleEventDescriptor) {
+    @objc func handleAppleEvent(_ event: NSAppleEventDescriptor, withReplyEvent: NSAppleEventDescriptor) {
         let fullCommand = URL(string: (event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue)!)
 
         let command = fullCommand?.host
@@ -1009,7 +1009,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
         if !menuAnimated {
             menuAnimationTimer = Timer(timeInterval: 0.5, target: self, selector: #selector(animateMenuItem), userInfo: nil, repeats: true)
             //statusItem.menu = NSMenu()
-            RunLoop.main.add(menuAnimationTimer, forMode: RunLoopMode.defaultRunLoopMode)
+            RunLoop.main.add(menuAnimationTimer, forMode: RunLoop.Mode.default)
             menuAnimationTimer.fire()
             menuAnimated = true
         }
@@ -1090,7 +1090,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
     // update the user info and build the actual menu
 
-    func updateUserInfo() {
+    @objc func updateUserInfo() {
 
         myLogger.logit(.base, message:"Updating User Info")
         updateRunning = true
@@ -1131,7 +1131,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
         })
 
         while !reachCheck && (abs(reachCheckDate.timeIntervalSinceNow) < 5) {
-            RunLoop.main.run(mode: RunLoopMode.defaultRunLoopMode, before: Date.distantFuture)
+            RunLoop.main.run(mode: RunLoop.Mode.default, before: Date.distantFuture)
             myLogger.logit(.debug, message: "Waiting for reachability check to return.")
             myLogger.logit(.debug, message: "Counting... " + String(abs(reachCheckDate.timeIntervalSinceNow)))
         }
@@ -1190,18 +1190,18 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
 
                             if defaults.string(forKey: Preferences.passwordExpireCustomAlert) != nil {
 
-                                let len = defaults.string(forKey: Preferences.passwordExpireCustomAlert)?.characters.count
+                                let len = defaults.string(forKey: Preferences.passwordExpireCustomAlert)?.count
 
                                 if Int(daysToGo) < defaults.integer(forKey: Preferences.passwordExpireCustomAlertTime) {
                                     let myMutableString = NSMutableAttributedString(string: defaults.string(forKey: Preferences.passwordExpireCustomAlert)!)
-                                    myMutableString.addAttribute(NSForegroundColorAttributeName, value: NSColor.red, range: NSRange(location: 0, length: len!))
+                                    myMutableString.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.red, range: NSRange(location: 0, length: len!))
 
                                     self.statusItem.attributedTitle = myMutableString
                                     self.statusItem.attributedTitle = myMutableString
 
                                 } else if Int(daysToGo) < defaults.integer(forKey: Preferences.passwordExpireCustomWarnTime) {
                                     let myMutableString = NSMutableAttributedString(string: defaults.string(forKey: Preferences.passwordExpireCustomAlert)!)
-                                    myMutableString.addAttribute(NSForegroundColorAttributeName, value: NSColor.yellow, range: NSRange(location: 0, length: len!))
+                                    myMutableString.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.yellow, range: NSRange(location: 0, length: len!))
 
                                     self.statusItem.attributedTitle = myMutableString
                                     self.statusItem.attributedTitle = myMutableString
@@ -1220,7 +1220,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
                             } else {
 
                                 let myMutableString = NSMutableAttributedString(string: String(daysToGo) + "d".translate)
-                                myMutableString.addAttribute(NSForegroundColorAttributeName, value: NSColor.red, range: NSRange(location: 0, length: 2))
+                                myMutableString.addAttribute(NSAttributedString.Key.foregroundColor, value: NSColor.red, range: NSRange(location: 0, length: 2))
                                 self.statusItem.attributedTitle = myMutableString
                                 self.statusItem.attributedTitle = myMutableString
                                 self.NoMADMenuPasswordExpires.title = String(format: "NoMADMenuController-PasswordExpiresInDays".translate, String(daysToGo))
@@ -1420,7 +1420,7 @@ class NoMADMenuController: NSObject, LoginWindowDelegate, PasswordChangeDelegate
             
             if ( !updateScheduled ) {
                 //delayTimer = Timer(timeInterval: 3.0, target: self, selector: #selector(updateUserInfo), userInfo: nil, repeats: false)
-                //RunLoop.main.add(delayTimer, forMode: RunLoopMode.defaultRunLoopMode)
+                //RunLoop.main.add(delayTimer, forMode: RunLoop.Mode.default)
                 //delayTimer.fire()
                 Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(updateUserInfo), userInfo: nil, repeats: false)
                 

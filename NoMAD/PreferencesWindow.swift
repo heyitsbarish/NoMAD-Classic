@@ -54,7 +54,7 @@ class PreferencesWindow: NSWindowController, NSWindowDelegate {
             alertController.addButton(withTitle: "OK")
             alertController.addButton(withTitle: "Quit NoMAD")
             alertController.beginSheetModal(for: self.window!) { response in
-                if response == 1001 {
+                if response.rawValue == 1001 {
                     NSApp.terminate(self)
                 }
             }
@@ -98,7 +98,7 @@ class PreferencesWindow: NSWindowController, NSWindowDelegate {
         //MARK: TODO This smells to be overly clever. We should find a simpler way.
         for object in controls {
             let identifier = object.identifier
-            if defaults.objectIsForced(forKey: identifier!) {
+            if defaults.objectIsForced(forKey: identifier!.rawValue) {
                 switch object.className {
                 case "NSTextField":
                     let textField = object as! NSTextField

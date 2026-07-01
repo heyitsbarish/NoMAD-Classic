@@ -43,7 +43,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 // wait a few seconds
                 let now = Date()
                 while abs(now.timeIntervalSinceNow) < 5 {
-                    RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date.distantFuture)
+                    RunLoop.current.run(mode: RunLoop.Mode.default, before: Date.distantFuture)
                 }
                 myLogger.logit(.base, message: "State change, checking things again.")
                 NotificationQueue.default.enqueue(updateNotification, postingStyle: .now)
@@ -76,7 +76,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         refreshTimer?.invalidate()
     }
 
-    func sendUpdateMessage() {
+    @objc func sendUpdateMessage() {
         myLogger.logit(.base, message: "It's been a while, checking things.")
         NotificationQueue.default.enqueue(updateNotification, postingStyle: .now)
     }
