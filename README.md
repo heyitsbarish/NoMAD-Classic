@@ -1,4 +1,4 @@
-# NoMAD, Universal — an Apple Silicon fork (2026)
+# NoMAD Classic — NoMAD v1, universal for Apple Silicon (2026)
 
 macOS is deprecating Intel-only apps, and the archived upstream only ever shipped Intel builds. The designated successor, [NoMAD-2](https://github.com/jamf/NoMAD-2), never reached a usable state before development stopped — so environments that still rely on NoMAD v1's stability and simplicity were left without a native path forward on Apple Silicon.
 
@@ -19,7 +19,14 @@ xcodebuild -project NoMAD.xcodeproj -scheme NoMAD -configuration Release build \
   CODE_SIGN_IDENTITY="-"
 ```
 
-There are no notarized releases here — it's ad-hoc signed, build-it-yourself. Locally built copies launch without Gatekeeper complaints.
+Building from source is the preferred install: a copy you build locally is signed on your own machine and launches without any Gatekeeper friction.
+
+**Prebuilt release (unsigned):** for convenience, a prebuilt universal `.zip` is available on the [Releases page](../../releases). It is **ad-hoc signed and not notarized** — there is no Developer ID behind this fork. Because the download is quarantined, macOS will refuse to open it the normal way. To run it, either:
+
+- right-click the app → **Open**, then approve it under **System Settings → Privacy & Security → Open Anyway**, or
+- clear the quarantine flag yourself: `xattr -d com.apple.quarantine /Applications/NoMAD.app`
+
+If any of that makes you uncomfortable (it should — you're trusting a stranger's binary), build from source. It's one `xcodebuild` invocation.
 
 **Caveats:** tested on the maintainer's own machines (macOS 26, Apple Silicon) against a real AD domain — Kerberos sign-in and renewal, password expiration display, keychain integration, and custom icons all verified working. Everything else inherits whatever state the 1.0.5-era code was in. MIT licensed, as upstream. Use at your own risk, and as always, read the man pages.
 
