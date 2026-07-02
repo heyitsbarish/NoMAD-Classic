@@ -4,6 +4,8 @@ macOS is deprecating Intel-only apps, and the archived upstream only ever shippe
 
 This fork takes the archived v1 source and makes it build with current Xcode as a **universal binary (Apple Silicon + Intel)** that runs natively on modern macOS.
 
+**A note on versions:** official NoMAD v1 releases ran through **1.3.0** (January 2022). The archived repo's main branch — the source this fork builds from — identifies as 1.0.5-era code, older than the final official binaries. To avoid any confusion between the two lines, this fork uses year-based versioning starting at **2026.1.0**, which always sorts above every official release.
+
 **What changed from the archived source:**
 
 - Migrated Swift 3 → Swift 5 (the code hadn't compiled on any Xcode released since ~2017)
