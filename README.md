@@ -1,3 +1,32 @@
+# NoMAD, Universal — an Apple Silicon fork (2026)
+
+macOS is deprecating Intel-only apps, and the archived upstream only ever shipped Intel builds. The designated successor, [NoMAD-2](https://github.com/jamf/NoMAD-2), never reached a usable state before development stopped — so environments that still rely on NoMAD v1's stability and simplicity were left without a native path forward on Apple Silicon.
+
+This fork takes the archived v1 source and makes it build with current Xcode as a **universal binary (Apple Silicon + Intel)** that runs natively on modern macOS.
+
+**What changed from the archived source:**
+
+- Migrated Swift 3 → Swift 5 (the code hadn't compiled on any Xcode released since ~2017)
+- Builds as a universal binary with a native arm64 slice; minimum macOS is now 11.0
+- Fixed a launch-sequence hang (`CFRunLoopRun()` in `applicationDidFinishLaunching`) that old macOS tolerated but modern macOS doesn't — it left the menu bar item unclickable and killed the periodic refresh
+- Status item ported to the modern `NSStatusItem.button` API so the icon and expiration countdown actually render
+- Custom menu bar icons (`IconOn`/`IconOff`/`IconOnDark`/`IconOffDark`) are now rendered as template images, so they adapt to menu bar appearance like a proper status icon
+
+**Building it:** open `NoMAD.xcodeproj` in Xcode and build, or:
+
+```
+xcodebuild -project NoMAD.xcodeproj -scheme NoMAD -configuration Release build \
+  CODE_SIGN_IDENTITY="-"
+```
+
+There are no notarized releases here — it's ad-hoc signed, build-it-yourself. Locally built copies launch without Gatekeeper complaints.
+
+**Caveats:** tested on the maintainer's own machines (macOS 26, Apple Silicon) against a real AD domain — Kerberos sign-in and renewal, password expiration display, keychain integration, and custom icons all verified working. Everything else inherits whatever state the 1.0.5-era code was in. MIT licensed, as upstream. Use at your own risk, and as always, read the man pages.
+
+The original archived README follows below.
+
+---
+
 # NoMAD Projects Archived
 
 Jamf has decided to archive the NoMAD repos on GitHub. Going forward they aren’t going to receive any updates. 
